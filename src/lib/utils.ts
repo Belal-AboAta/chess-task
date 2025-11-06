@@ -1,6 +1,6 @@
 import type { CSSProperties } from "react";
 
-import { PIECES } from "@/constants/pieces";
+import { PIECE_NOTATIONS, PIECE_TYPE, PIECES } from "@/constants/pieces";
 import type { PlayerRespctiveType } from "@/types/playerTypes";
 
 export function getBoardCoordinatesFromIndex(
@@ -101,4 +101,27 @@ export function getNewMove(
   newPosition[from.rank][from.file] = "";
 
   return newPosition;
+}
+
+export function getPieceNotation(piece: string): string {
+  return PIECE_NOTATIONS[piece] || "";
+}
+
+export function getPieceType(piece: string): string {
+  return PIECE_TYPE[piece] || "";
+}
+
+export function getEnemy(piece: string): string {
+  const player = piece[0];
+  return player === "w" ? "b" : "w";
+}
+
+export function isEnemyPiece(enemy: string, piece: string): boolean {
+  if (!piece) return false;
+  return enemy === piece[0];
+}
+
+export function isFriendlyPiece(piece: string, otherPiece: string): boolean {
+  if (!piece || !otherPiece) return false;
+  return piece[0] === otherPiece[0];
 }
