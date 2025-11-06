@@ -49,8 +49,8 @@ export function getCoords(
 ) {
   if (!ref.current) return { x: -1, y: -1 };
   const { top, left } = ref.current.getBoundingClientRect();
-  const y = Math.floor((e.clientX - left) / tileSize);
-  const x = 7 - Math.floor((e.clientY - top) / tileSize);
+  const x = Math.floor((e.clientX - left) / tileSize);
+  const y = 7 - Math.floor((e.clientY - top) / tileSize);
 
   return { x, y };
 }

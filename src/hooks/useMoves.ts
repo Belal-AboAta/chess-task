@@ -18,7 +18,7 @@ export const useMoves = () => {
       currentPosition,
       piece,
       { rank: Number(rank), file: Number(file) },
-      { rank: x, file: y },
+      { rank: y, file: x },
     );
 
     dispatch(setPosition(newMove));
