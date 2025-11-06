@@ -15,8 +15,8 @@ export const playerRespectiveSlice = createSlice({
   name: "playerRespective",
   initialState,
   reducers: {
-    changeRespective: (state, action: PayloadAction<PlayerRespctiveType>) => {
-      state.respective = action.payload;
+    changeRespective: (state) => {
+      state.respective = state.respective === "white" ? "black" : "white";
     },
   },
 });

@@ -1,3 +1,6 @@
+import type { CSSProperties } from "react";
+
+import { PIECES } from "@/constants/pieces";
 import type { PlayerRespctiveType } from "@/types/playerTypes";
 
 export function getBoardCoordinatesFromIndex(
@@ -24,4 +27,78 @@ export function getBoardCoordinatesFromIndex(
 export function getFileLabel(file: number): string {
   const fileLabels = ["a", "b", "c", "d", "e", "f", "g", "h"];
   return fileLabels[file - 1] || "";
+}
+
+export function getPieceImagePath(piece: string): string {
+  return new URL(`../assets/${piece}.png`, import.meta.url).href;
+}
+
+export function getPiecePosition(rank: number, file: number): CSSProperties {
+  const x = file * 100;
+  const y = (7 - rank) * 100;
+
+  return {
+    translate: `${x}% ${y}%`,
+  };
+}
+
+export function getCoords(
+  e: React.DragEvent<HTMLDivElement>,
+  ref: React.RefObject<HTMLDivElement | null>,
+  tileSize: number,
+) {
+  if (!ref.current) return { x: -1, y: -1 };
+  const { top, left } = ref.current.getBoundingClientRect();
+  const y = Math.floor((e.clientX - left) / tileSize);
+  const x = 7 - Math.floor((e.clientY - top) / tileSize);
+
+  return { x, y };
+}
+
+export function createPosition() {
+  const position = new Array(8).fill("").map(() => new Array(8).fill(""));
+
+  for (let i = 0; i < 8; i++) {
+    position[6][i] = PIECES.BP;
+    position[1][i] = PIECES.WP;
+  }
+
+  position[0][0] = PIECES.WR;
+  position[0][1] = PIECES.WN;
+  position[0][2] = PIECES.WB;
+  position[0][3] = PIECES.WQ;
+  position[0][4] = PIECES.WK;
+  position[0][5] = PIECES.WB;
+  position[0][6] = PIECES.WN;
+  position[0][7] = PIECES.WR;
+  position[7][0] = PIECES.BR;
+  position[7][1] = PIECES.BN;
+  position[7][2] = PIECES.BB;
+  position[7][3] = PIECES.BQ;
+  position[7][4] = PIECES.BK;
+  position[7][5] = PIECES.BB;
+  position[7][6] = PIECES.BN;
+  position[7][7] = PIECES.BR;
+
+  return position;
+}
+
+export function extractLastPosition(positions: string[][][]) {
+  const lastPosition = positions[positions.length - 1];
+  if (!lastPosition) return;
+  return lastPosition;
+}
+
+export function getNewMove(
+  currentPosition: string[][],
+  piece: string,
+  from: { rank: number; file: number },
+  to: { rank: number; file: number },
+) {
+  const newPosition = [...currentPosition.map((row) => [...row])];
+
+  newPosition[to.rank][to.file] = piece;
+  newPosition[from.rank][from.file] = "";
+
+  return newPosition;
 }

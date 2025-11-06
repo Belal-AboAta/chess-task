@@ -8,6 +8,8 @@ import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { selectRespective } from "@/store/playerRespectiveSlice";
 import { changeTileSize } from "@/store/tileSizeSlice";
 import { TileLabel } from "../components/TileLabel";
+import { Pieces } from "../Pieces";
+import { usePosition } from "@/hooks/usePosition";
 
 export const Board: React.FC<React.HTMLAttributes<HTMLDivElement>> = ({
   ...props
@@ -18,6 +20,8 @@ export const Board: React.FC<React.HTMLAttributes<HTMLDivElement>> = ({
   const { width } = useBoardSize(boardRef);
   const { tileSize } = useTileSize(width);
 
+  const { flipBoard } = usePosition();
+
   useEffect(() => {
     if (tileSize > 0) {
       dispatch(changeTileSize(tileSize));
@@ -25,7 +29,7 @@ export const Board: React.FC<React.HTMLAttributes<HTMLDivElement>> = ({
   }, [dispatch, tileSize]);
   return (
     <div
-      className="w-full md:w-2/3 max-w-[800px] lg:rounded-lg aspect-square"
+      className="w-full md:w-2/3 max-w-[800px] lg:rounded-lg aspect-square relative"
       {...props}
       ref={boardRef}
     >
@@ -66,6 +70,10 @@ export const Board: React.FC<React.HTMLAttributes<HTMLDivElement>> = ({
           );
         })}
       </div>
+      <Pieces />
+      <button className="absolute" onClick={flipBoard}>
+        Flip board
+      </button>
     </div>
   );
 };
