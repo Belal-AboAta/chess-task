@@ -1,7 +1,13 @@
 import { configureStore } from "@reduxjs/toolkit";
 
+import playerRespectiveReducer from "./playerRespectiveSlice";
+import tileSizeReducer from "./tileSizeSlice";
+
 export const store = configureStore({
-  reducer: {},
+  reducer: {
+    playerRespective: playerRespectiveReducer,
+    tileSize: tileSizeReducer,
+  },
 });
 
 export type AppStore = typeof store;
