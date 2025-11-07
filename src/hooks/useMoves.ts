@@ -3,6 +3,7 @@ import { getCoords } from "@/lib/utils";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import {
   changeTurn,
+  clearCandidateMoves,
   selectCandidateMoves,
   setPosition,
 } from "@/store/positionSlice";
@@ -32,6 +33,7 @@ export const useMoves = () => {
       to: { rank: y, file: x },
     });
 
+    dispatch(clearCandidateMoves());
     dispatch(changeTurn());
 
     dispatch(setPosition(newPosition));

@@ -24,7 +24,7 @@ export const Piece: React.FC<PieceProps> = ({ piece, rank, file }) => {
       key={`${rank}-${file}`}
       src={pieceImagePath}
       alt="chess-piece"
-      className="absolute w-[12.5%] h-[12.5%] transition-all duration-300 select-none"
+      className="absolute w-[12.5%] h-[12.5%] transition-all duration-300 select-none cursor-pointer"
       style={piecePosition}
       draggable={true}
       onDragStart={handleDragStart}

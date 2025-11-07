@@ -57,6 +57,21 @@ export interface IPerfromMoveParams {
   };
 }
 
+export interface IGetCheckTileParams {
+  positionAfterMove: string[][];
+  position: string[][];
+  piece: string;
+}
+
+export interface IGetTileClassParams {
+  candidateMoves: MovesType;
+  kingCheckedTile: [number, number] | null;
+  position: string[][];
+  rank: number;
+  file: number;
+  selectedTile?: [number, number];
+}
+
 export const getSlidingMoves = ({
   position,
   direction,
@@ -355,4 +370,55 @@ export function getValidMoves({
   }
 
   return validMoves;
+}
+
+export function getCheckTile({
+  positionAfterMove,
+  position,
+  piece,
+}: IGetCheckTileParams) {
+  const isTileChecked = isPlayerInCheck({
+    positionAfterMove,
+    position,
+    piece,
+  });
+  if (!isTileChecked) return null;
+
+  const enemy = getEnemy(piece);
+  const kingPos = getKingPosition({
+    position: positionAfterMove,
+    piece: enemy,
+  });
+
+  return kingPos;
+}
+
+export function getTileClass({
+  candidateMoves,
+  position,
+  kingCheckedTile,
+  rank,
+  file,
+  selectedTile,
+}: IGetTileClassParams) {
+  const tile = position[rank][file];
+
+  for (const [x, y] of candidateMoves) {
+    const [selRank, selFile] = selectedTile || [-1, -1];
+    if (x === rank && y === file) {
+      if (selRank === rank && selFile === file) return "selected";
+      if (tile === "") {
+        return "highlight";
+      } else {
+        return "attacking";
+      }
+    }
+  }
+
+  if (kingCheckedTile) {
+    const [kingRank, kingFile] = kingCheckedTile;
+    if (kingRank === rank && kingFile === file) {
+      return "checked";
+    }
+  }
 }

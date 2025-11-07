@@ -7,6 +7,8 @@ import {
 } from "@/lib/utils";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import {
+  clearCandidateMoves,
+  clearSelectedTile,
   selectPositions,
   selectTurn,
   setCandidateMoves,
@@ -61,9 +63,15 @@ export const useDragAndDrop = () => {
     const element = e.target as HTMLImageElement;
 
     element.style.display = "block";
+    dispatch(clearCandidateMoves());
+    dispatch(clearSelectedTile());
   };
 
-  const onDragOver = (e: React.DragEvent<HTMLDivElement>) => {
+  const onDragOver = (
+    e: React.DragEvent<HTMLDivElement>,
+    onDragOverCB: () => void,
+  ) => {
+    onDragOverCB();
     e.preventDefault();
   };
 

@@ -2,26 +2,54 @@ import clsx from "clsx";
 import React, { useEffect, useRef } from "react";
 
 import { useBoardSize } from "@/hooks/useBoardSize";
+import { usePosition } from "@/hooks/usePosition";
+import { useSelectedTile } from "@/hooks/useSelectedTile";
 import { useTileSize } from "@/hooks/useTileSize";
-import { getBoardCoordinatesFromIndex } from "@/lib/utils";
+import { getCheckTile, getTileClass } from "@/lib/piecesMoves";
+import {
+  extractLastPosition,
+  extractPositionAtLastIndex,
+  getBoardCoordinatesFromIndex,
+} from "@/lib/utils";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { selectRespective } from "@/store/playerRespectiveSlice";
+import { selectCandidateMoves, selectPositions } from "@/store/positionSlice";
 import { changeTileSize } from "@/store/tileSizeSlice";
 import { TileLabel } from "../components/TileLabel";
 import { Pieces } from "../Pieces";
-import { usePosition } from "@/hooks/usePosition";
 
 export const Board: React.FC<React.HTMLAttributes<HTMLDivElement>> = ({
   ...props
 }) => {
   const dispatch = useAppDispatch();
   const respective = useAppSelector(selectRespective);
+  const positions = useAppSelector(selectPositions);
+  const candidateMoves = useAppSelector(selectCandidateMoves);
   const boardRef = useRef<HTMLDivElement>(null);
   const { width } = useBoardSize(boardRef);
   const { tileSize } = useTileSize(width);
 
   const { flipBoard } = usePosition();
+  const { selectedTile } = useSelectedTile();
 
+  const currentPosition = extractLastPosition(positions);
+  const prevPosition =
+    extractPositionAtLastIndex(positions, 2) || currentPosition;
+
+  const kingCheckedTile = getCheckTile({
+    positionAfterMove: currentPosition!,
+    position: prevPosition!,
+    piece: respective === "white" ? "bk" : "wk",
+  });
+  const getClass = (rank: number, file: number) =>
+    getTileClass({
+      candidateMoves: candidateMoves || [],
+      position: currentPosition!,
+      rank,
+      file,
+      kingCheckedTile,
+      selectedTile,
+    });
   useEffect(() => {
     if (tileSize > 0) {
       dispatch(changeTileSize(tileSize));
@@ -41,12 +69,15 @@ export const Board: React.FC<React.HTMLAttributes<HTMLDivElement>> = ({
           const { rank, file, isBlack, isLastRank, isLastFile } =
             getBoardCoordinatesFromIndex(index, respective);
 
+          const tileClass = getClass(7 - rank, file);
+
           return (
             <div
               key={index}
               className={clsx(
                 isBlack ? "bg-black-tile" : "bg-white-tile",
                 "relative select-none",
+                tileClass,
               )}
               style={{ width: tileSize, height: tileSize }}
             >

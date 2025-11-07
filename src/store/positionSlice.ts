@@ -10,6 +10,7 @@ export interface positionState {
   positions: string[][][];
   candidateMoves?: number[][];
   gameState: GameStateType;
+  selectedTile?: [number, number];
   turn: PlayerTurnType;
 }
 
@@ -33,6 +34,18 @@ export const positionSlice = createSlice({
     ) => {
       state.candidateMoves = action.payload;
     },
+    clearCandidateMoves: (state) => {
+      state.candidateMoves = undefined;
+    },
+    setSelectedTile: (
+      state,
+      action: PayloadAction<positionState["selectedTile"]>,
+    ) => {
+      state.selectedTile = action.payload;
+    },
+    clearSelectedTile: (state) => {
+      state.selectedTile = undefined;
+    },
     setGameState: (
       state,
       action: PayloadAction<positionState["gameState"]>,
@@ -45,13 +58,22 @@ export const positionSlice = createSlice({
   },
 });
 
-export const { setPosition, setCandidateMoves, setGameState, changeTurn } =
-  positionSlice.actions;
+export const {
+  setPosition,
+  setCandidateMoves,
+  clearCandidateMoves,
+  setSelectedTile,
+  clearSelectedTile,
+  setGameState,
+  changeTurn,
+} = positionSlice.actions;
 
 export const selectPositions = (state: RootState) => state.position.positions;
 export const selectCandidateMoves = (state: RootState) =>
   state.position.candidateMoves;
 export const selectGameState = (state: RootState) => state.position.gameState;
 export const selectTurn = (state: RootState) => state.position.turn;
+export const selectSelectedTile = (state: RootState) =>
+  state.position.selectedTile;
 
 export default positionSlice.reducer;
