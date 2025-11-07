@@ -1,7 +1,7 @@
 import type { CSSProperties } from "react";
 
 import { PIECE_NOTATIONS, PIECE_TYPE, PIECES } from "@/constants/pieces";
-import type { PlayerRespctiveType } from "@/types/playerTypes";
+import type { PlayerRespctiveType, PlayerTurnType } from "@/types/playerTypes";
 
 export function getBoardCoordinatesFromIndex(
   index: number,
@@ -89,18 +89,19 @@ export function extractLastPosition(positions: string[][][]) {
   return lastPosition;
 }
 
-export function getNewMove(
-  currentPosition: string[][],
-  piece: string,
-  from: { rank: number; file: number },
-  to: { rank: number; file: number },
+export function extractPositionAtIndex(positions: string[][][], index: number) {
+  const position = positions[index];
+  if (!position) return;
+  return position;
+}
+
+export function extractPositionAtLastIndex(
+  positions: string[][][],
+  lastIndex: number,
 ) {
-  const newPosition = [...currentPosition.map((row) => [...row])];
-
-  newPosition[to.rank][to.file] = piece;
-  newPosition[from.rank][from.file] = "";
-
-  return newPosition;
+  const position = positions[positions.length - lastIndex];
+  if (!position) return;
+  return position;
 }
 
 export function getPieceNotation(piece: string): string {
@@ -124,4 +125,8 @@ export function isEnemyPiece(enemy: string, piece: string): boolean {
 export function isFriendlyPiece(piece: string, otherPiece: string): boolean {
   if (!piece || !otherPiece) return false;
   return piece[0] === otherPiece[0];
+}
+
+export function isPlayerTurn(turn: PlayerTurnType, piece: string): boolean {
+  return isFriendlyPiece(turn, piece);
 }
