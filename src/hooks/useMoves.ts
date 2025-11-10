@@ -85,14 +85,16 @@ export const useMoves = () => {
       piece: piece,
     });
 
-    if (detectCheckMate) {
-      dispatch(setGameState("checkmate"));
-      GAME_END_SOUND.play();
-    }
     const detectInsufficientMaterial = isInsufficientMaterial(newPosition);
 
     if (detectStalemate || detectInsufficientMaterial) {
       dispatch(setGameState("draw"));
+      GAME_END_SOUND.play();
+    }
+
+    if (detectCheckMate) {
+      dispatch(setGameState("checkmate"));
+      dispatch(changeTurn());
       GAME_END_SOUND.play();
     }
   };
