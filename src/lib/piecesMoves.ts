@@ -119,7 +119,8 @@ export const getPawnMoves = ({
   const rankNum = +rank;
   const fileNum = +file;
 
-  const isFirstPawnMove = rankNum % 5 === 1;
+  const pawnStartRank = piece === PIECES.WP ? 1 : 6;
+  const isFirstPawnMove = rankNum === pawnStartRank;
   const oneStepAhead = position?.[rankNum + dir]?.[fileNum];
   const twoStepsAhead = position?.[rankNum + dir * 2]?.[fileNum];
 
@@ -293,7 +294,10 @@ export function isPlayerInCheck({
     });
 
     for (const [x, y] of moves) {
-      if (positionAfterMove[x][y] === enemyKing) {
+      if (
+        positionAfterMove?.[x]?.[y] &&
+        positionAfterMove?.[x]?.[y] === enemyKing
+      ) {
         return true;
       }
     }
@@ -310,6 +314,7 @@ export function preformMove({ position, from, to }: IPerfromMoveParams) {
   const isPieceKing = getPieceType(piece) === PIECE_TYPE[PIECES.WK];
 
   let isCapture = false;
+  let promotionSquare;
 
   // Handle Castling
   // TODO: Handle castling with flip board effect
@@ -325,6 +330,17 @@ export function preformMove({ position, from, to }: IPerfromMoveParams) {
       newPosition[from.rank][7] = "";
       newPosition[from.rank][5] = piece.startsWith("w") ? PIECES.WR : PIECES.BR;
     }
+  }
+
+  if (isPiecePawn && (to.rank === 0 || to.rank === 7)) {
+    promotionSquare = {
+      from: {
+        ...from,
+      },
+      to: {
+        ...to,
+      },
+    };
   }
 
   // EnPassant capture
@@ -346,8 +362,9 @@ export function preformMove({ position, from, to }: IPerfromMoveParams) {
   newPosition[from.rank][from.file] = "";
 
   return {
-    newPosition: newPosition,
-    isCapture: isCapture,
+    newPosition,
+    isCapture,
+    promotionSquare,
   };
 }
 
@@ -540,10 +557,6 @@ export function isCheckMate({
     positionAfterMove,
     position,
     pieces,
-    moves,
-  });
-  console.log({
-    isInCheck,
     moves,
   });
 

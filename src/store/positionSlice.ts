@@ -12,6 +12,16 @@ export interface positionState {
   gameState: GameStateType;
   selectedTile?: [number, number];
   turn: PlayerTurnType;
+  promotionSquare?: {
+    from: {
+      rank: number;
+      file: number;
+    };
+    to: {
+      rank: number;
+      file: number;
+    };
+  };
 }
 
 const initialState: positionState = {
@@ -19,6 +29,7 @@ const initialState: positionState = {
   candidateMoves: undefined,
   gameState: "ongoing",
   turn: "wk",
+  promotionSquare: undefined,
 };
 
 export const positionSlice = createSlice({
@@ -67,6 +78,15 @@ export const positionSlice = createSlice({
     changeTurn: (state) => {
       state.turn = state.turn === "wk" ? "bk" : "wk";
     },
+    setPromotionSquare: (
+      state,
+      action: PayloadAction<positionState["promotionSquare"]>,
+    ) => {
+      state.promotionSquare = action.payload;
+    },
+    clearPromotionSquare: (state) => {
+      state.promotionSquare = undefined;
+    },
   },
 });
 
@@ -81,6 +101,8 @@ export const {
   clearSelectedTile,
   setGameState,
   changeTurn,
+  setPromotionSquare,
+  clearPromotionSquare,
 } = positionSlice.actions;
 
 export const selectPositions = (state: RootState) => state.position.positions;
@@ -90,5 +112,7 @@ export const selectGameState = (state: RootState) => state.position.gameState;
 export const selectTurn = (state: RootState) => state.position.turn;
 export const selectSelectedTile = (state: RootState) =>
   state.position.selectedTile;
+export const selectPromotionSquare = (state: RootState) =>
+  state.position.promotionSquare;
 
 export default positionSlice.reducer;

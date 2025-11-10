@@ -121,6 +121,10 @@ export function createPosition() {
   // position[4][2] = PIECES.WK;
   // position[0][7] = PIECES.WQ;
 
+  // a promotion position before a move
+  // position[5][0] = PIECES.WP;
+  // position[7][3] = PIECES.BK;
+  // position[0][0] = PIECES.WK;
   return position;
 }
 

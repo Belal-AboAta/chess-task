@@ -1,8 +1,9 @@
 import { Provider } from "react-redux";
 
 import { Board } from "@/features/Board";
-import { store } from "@/store";
 import { BoardStatus } from "@/features/Board/components/BoardStatus";
+import { store } from "@/store";
+import { PromotionBox } from "./features/PromotionBox";
 
 function App() {
   return (
@@ -11,6 +12,7 @@ function App() {
         <Board />
         <BoardStatus />
       </div>
+      <PromotionBox />
     </Provider>
   );
 }

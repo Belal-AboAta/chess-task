@@ -110,5 +110,14 @@ export const GAME_STATE_INFO: Record<GameStateType, Record<string, string>> = {
     label: "Draw!",
     description: "The game ended in a draw.",
   },
-  promotion: {},
+  promotion: {
+    imagePath: "../assets/{{}}.png",
+    label: "Promotion!",
+    description: "{{}} to promote a pawn.",
+  },
+};
+
+export const PROMOTION_PIECES: Record<PieceKey, PieceKey[]> = {
+  [PIECES.WK]: [PIECES.WQ, PIECES.WR, PIECES.WB, PIECES.WN],
+  [PIECES.BK]: [PIECES.BQ, PIECES.BR, PIECES.BB, PIECES.BN],
 };

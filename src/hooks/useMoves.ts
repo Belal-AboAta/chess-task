@@ -14,6 +14,7 @@ import {
   selectGameState,
   setGameState,
   setPosition,
+  setPromotionSquare,
 } from "@/store/positionSlice";
 import { selectTileSize } from "@/store/tileSizeSlice";
 
@@ -36,7 +37,7 @@ export const useMoves = () => {
     const isValidMove = validMoves.some(([r, f]) => r === y && f === x);
     if (!isValidMove) return;
 
-    const { newPosition, isCapture } = preformMove({
+    const { newPosition, isCapture, promotionSquare } = preformMove({
       position: currentPosition,
       from: { rank: Number(rank), file: Number(file) },
       to: { rank: y, file: x },
@@ -47,7 +48,13 @@ export const useMoves = () => {
     dispatch(clearCandidateMoves());
 
     if (gameStat === "ongoing") {
-      dispatch(setPosition(newPosition));
+      if (promotionSquare) {
+        dispatch(setGameState("promotion"));
+        dispatch(setPromotionSquare(promotionSquare));
+      } else {
+        dispatch(setPosition(newPosition));
+        dispatch(changeTurn());
+      }
       if (isCapture) {
         CAPTURE_SOUND.play();
       } else {
@@ -76,10 +83,6 @@ export const useMoves = () => {
     if (detectStalemate || detectInsufficientMaterial) {
       dispatch(setGameState("draw"));
       GAME_END_SOUND.play();
-    }
-
-    if (!detectStalemate && !detectCheckMate && !detectInsufficientMaterial) {
-      dispatch(changeTurn());
     }
   };
 
