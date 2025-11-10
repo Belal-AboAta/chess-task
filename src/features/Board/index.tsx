@@ -2,7 +2,6 @@ import clsx from "clsx";
 import React, { useEffect, useRef } from "react";
 
 import { useBoardSize } from "@/hooks/useBoardSize";
-import { usePosition } from "@/hooks/usePosition";
 import { useSelectedTile } from "@/hooks/useSelectedTile";
 import { useTileSize } from "@/hooks/useTileSize";
 import { getCheckTile, getTileClass } from "@/lib/piecesMoves";
@@ -29,7 +28,6 @@ export const Board: React.FC<React.HTMLAttributes<HTMLDivElement>> = ({
   const { width } = useBoardSize(boardRef);
   const { tileSize } = useTileSize(width);
 
-  const { flipBoard } = usePosition();
   const { selectedTile } = useSelectedTile();
 
   const currentPosition = extractLastPosition(positions);
@@ -102,9 +100,6 @@ export const Board: React.FC<React.HTMLAttributes<HTMLDivElement>> = ({
         })}
       </div>
       <Pieces />
-      <button className="absolute" onClick={flipBoard}>
-        Flip board
-      </button>
     </div>
   );
 };
