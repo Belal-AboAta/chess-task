@@ -309,6 +309,8 @@ export function preformMove({ position, from, to }: IPerfromMoveParams) {
   const isPiecePawn = getPieceType(piece) === PIECE_TYPE[PIECES.WP];
   const isPieceKing = getPieceType(piece) === PIECE_TYPE[PIECES.WK];
 
+  let isCapture = false;
+
   // Handle Castling
   // TODO: Handle castling with flip board effect
   if (isPieceKing && Math.abs(to.file - from.file) > 1) {
@@ -333,12 +335,20 @@ export function preformMove({ position, from, to }: IPerfromMoveParams) {
   ) {
     // Capturing EnPassant
     newPosition[from.rank][to.file] = "";
+    isCapture = true;
+  }
+
+  if (position[to.rank][to.file] !== "") {
+    isCapture = true;
   }
 
   newPosition[to.rank][to.file] = piece;
   newPosition[from.rank][from.file] = "";
 
-  return newPosition;
+  return {
+    newPosition: newPosition,
+    isCapture: isCapture,
+  };
 }
 
 export function getValidMoves({
@@ -359,7 +369,7 @@ export function getValidMoves({
   const validMoves: MovesType = [];
 
   for (const [x, y] of possibleMoves) {
-    const newPosition = preformMove({
+    const { newPosition } = preformMove({
       position,
       from: { rank: Number(rank), file: Number(file) },
       to: { rank: x, file: y },

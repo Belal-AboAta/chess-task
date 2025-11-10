@@ -9,6 +9,7 @@ import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import {
   clearCandidateMoves,
   clearSelectedTile,
+  selectGameState,
   selectPositions,
   selectTurn,
   setCandidateMoves,
@@ -17,6 +18,7 @@ import {
 export const useDragAndDrop = () => {
   const turn = useAppSelector(selectTurn);
   const positions = useAppSelector(selectPositions);
+  const gameStat = useAppSelector(selectGameState);
 
   const dispatch = useAppDispatch();
 
@@ -43,15 +45,17 @@ export const useDragAndDrop = () => {
 
     if (!currentPosition) return;
 
-    const validMoves = getValidMoves({
-      position: currentPosition,
-      piece,
-      rank: rank.toString(),
-      file: file.toString(),
-      prevPosition: prevPosition,
-    });
+    if (gameStat === "ongoing") {
+      const validMoves = getValidMoves({
+        position: currentPosition,
+        piece,
+        rank: rank.toString(),
+        file: file.toString(),
+        prevPosition: prevPosition,
+      });
 
-    dispatch(setCandidateMoves(validMoves));
+      dispatch(setCandidateMoves(validMoves));
+    }
   };
 
   const onDrop = (e: React.DragEvent<HTMLDivElement>, onDropCB: () => void) => {

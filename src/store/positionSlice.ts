@@ -38,10 +38,13 @@ export const positionSlice = createSlice({
       state.candidateMoves = action.payload;
     },
     undomMove: (state) => {
-      if (state.positions.length > 1) {
+      if (state.positions.length > 1 && state.gameState === "ongoing") {
         state.positions.pop();
         state.turn = state.turn === "wk" ? "bk" : "wk";
       }
+    },
+    setNewGame: (state) => {
+      Object.assign(state, initialState);
     },
     clearCandidateMoves: (state) => {
       state.candidateMoves = undefined;
@@ -71,6 +74,7 @@ export const {
   setPositions,
   setPosition,
   setCandidateMoves,
+  setNewGame,
   undomMove,
   clearCandidateMoves,
   setSelectedTile,

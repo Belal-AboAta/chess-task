@@ -1,3 +1,4 @@
+import { CAPTURE_SOUND, GAME_END_SOUND, MOVE_SOUND } from "@/constants/sounds";
 import {
   isCheckMate,
   isInsufficientMaterial,
@@ -10,6 +11,7 @@ import {
   changeTurn,
   clearCandidateMoves,
   selectCandidateMoves,
+  selectGameState,
   setGameState,
   setPosition,
 } from "@/store/positionSlice";
@@ -18,6 +20,7 @@ import { selectTileSize } from "@/store/tileSizeSlice";
 export const useMoves = () => {
   const tileSize = useAppSelector(selectTileSize);
   const validMoves = useAppSelector(selectCandidateMoves);
+  const gameStat = useAppSelector(selectGameState);
   const dispatch = useAppDispatch();
   const move = (
     e: React.DragEvent<HTMLDivElement>,
@@ -33,20 +36,24 @@ export const useMoves = () => {
     const isValidMove = validMoves.some(([r, f]) => r === y && f === x);
     if (!isValidMove) return;
 
-    const newPosition = preformMove({
+    const { newPosition, isCapture } = preformMove({
       position: currentPosition,
       from: { rank: Number(rank), file: Number(file) },
       to: { rank: y, file: x },
     });
 
-    const moveSound = new Audio("/sounds/move.mp3");
-    moveSound.play();
-
     // TODO: add sounds for capture, check, checkmate, castling, promotion
 
     dispatch(clearCandidateMoves());
 
-    dispatch(setPosition(newPosition));
+    if (gameStat === "ongoing") {
+      dispatch(setPosition(newPosition));
+      if (isCapture) {
+        CAPTURE_SOUND.play();
+      } else {
+        MOVE_SOUND.play();
+      }
+    }
 
     const detectStalemate = isStalematePosition({
       positionAfterMove: newPosition,
@@ -62,11 +69,13 @@ export const useMoves = () => {
 
     if (detectCheckMate) {
       dispatch(setGameState("checkmate"));
+      GAME_END_SOUND.play();
     }
     const detectInsufficientMaterial = isInsufficientMaterial(newPosition);
 
     if (detectStalemate || detectInsufficientMaterial) {
       dispatch(setGameState("draw"));
+      GAME_END_SOUND.play();
     }
 
     if (!detectStalemate && !detectCheckMate && !detectInsufficientMaterial) {

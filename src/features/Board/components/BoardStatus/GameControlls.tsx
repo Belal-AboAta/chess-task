@@ -1,7 +1,12 @@
 import clsx from "clsx";
 
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
-import { selectPositions, undomMove } from "@/store/positionSlice";
+import {
+  selectGameState,
+  selectPositions,
+  setNewGame,
+  undomMove,
+} from "@/store/positionSlice";
 import { ChessKing, Undo2Icon } from "lucide-react";
 
 export interface GameControllsProps {
@@ -10,17 +15,18 @@ export interface GameControllsProps {
 
 export const GameControlls = ({ tileSize }: GameControllsProps) => {
   const positions = useAppSelector(selectPositions);
+  const gameState = useAppSelector(selectGameState);
   const dispatch = useAppDispatch();
   const ICONS = [
     {
       icon: <Undo2Icon size={tileSize / 4} />,
       action: () => dispatch(undomMove()),
       title: "Undo Move",
-      isDisabled: positions.length <= 1,
+      isDisabled: positions.length <= 1 || gameState !== "ongoing",
     },
     {
       icon: <ChessKing size={tileSize / 4} />,
-      action: () => console.log("Resign game"),
+      action: () => dispatch(setNewGame()),
       title: "New Game",
     },
   ];
