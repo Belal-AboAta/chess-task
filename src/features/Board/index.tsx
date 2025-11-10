@@ -12,7 +12,11 @@ import {
 } from "@/lib/utils";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { selectRespective } from "@/store/playerRespectiveSlice";
-import { selectCandidateMoves, selectPositions } from "@/store/positionSlice";
+import {
+  selectCandidateMoves,
+  selectPositions,
+  selectTurn,
+} from "@/store/positionSlice";
 import { changeTileSize } from "@/store/tileSizeSlice";
 import { TileLabel } from "../components/TileLabel";
 import { Pieces } from "../Pieces";
@@ -22,6 +26,7 @@ export const Board: React.FC<React.HTMLAttributes<HTMLDivElement>> = ({
 }) => {
   const dispatch = useAppDispatch();
   const respective = useAppSelector(selectRespective);
+  const turn = useAppSelector(selectTurn);
   const positions = useAppSelector(selectPositions);
   const candidateMoves = useAppSelector(selectCandidateMoves);
   const boardRef = useRef<HTMLDivElement>(null);
@@ -37,7 +42,7 @@ export const Board: React.FC<React.HTMLAttributes<HTMLDivElement>> = ({
   const kingCheckedTile = getCheckTile({
     positionAfterMove: currentPosition!,
     position: prevPosition!,
-    piece: respective === "white" ? "bk" : "wk",
+    piece: turn,
   });
   const getClass = (rank: number, file: number) =>
     getTileClass({
