@@ -316,12 +316,12 @@ export function preformMove({ position, from, to }: IPerfromMoveParams) {
     if (to.file === 2) {
       // Castles Long
       newPosition[from.rank][0] = "";
-      newPosition[from.rank][3] = piece.startsWith("w") ? "wr" : "br";
+      newPosition[from.rank][3] = piece.startsWith("w") ? PIECES.WR : PIECES.BR;
     }
     if (to.file === 6) {
       // Castles Short
       newPosition[from.rank][7] = "";
-      newPosition[from.rank][5] = piece.startsWith("w") ? "wr" : "br";
+      newPosition[from.rank][5] = piece.startsWith("w") ? PIECES.WR : PIECES.BR;
     }
   }
 
