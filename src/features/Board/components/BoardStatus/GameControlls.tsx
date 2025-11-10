@@ -28,6 +28,7 @@ export const GameControlls = ({ tileSize }: GameControllsProps) => {
       icon: <ChessKing size={tileSize / 4} />,
       action: () => dispatch(setNewGame()),
       title: "New Game",
+      isDisabled: positions.length <= 1,
     },
   ];
 
