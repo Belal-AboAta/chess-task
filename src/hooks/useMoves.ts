@@ -33,6 +33,11 @@ export const useMoves = () => {
       to: { rank: y, file: x },
     });
 
+    const moveSound = new Audio("/sounds/move.mp3");
+    moveSound.play();
+
+    // TODO: add sounds for capture, check, checkmate, castling, promotion
+
     dispatch(clearCandidateMoves());
     dispatch(changeTurn());
 
