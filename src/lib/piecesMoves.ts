@@ -455,10 +455,9 @@ export function isStalematePosition({
 }: IIsPlayerInCheckParams) {
   const isInCheck = isPlayerInCheck({ positionAfterMove, position, piece });
   if (isInCheck) return false;
-  const enemy = getEnemy(piece);
   const pieces = getEnemyPieces({
     position,
-    piece: enemy === "w" ? PIECES.WK : PIECES.BK,
+    piece,
   });
   const moves: MovesType = [];
 
