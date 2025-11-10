@@ -72,6 +72,13 @@ export interface IGetTileClassParams {
   selectedTile?: [number, number];
 }
 
+export interface IGetAllValidMovesParams {
+  positionAfterMove: string[][];
+  position: string[][];
+  pieces: ReturnType<typeof getEnemyPieces>;
+  moves: MovesType;
+}
+
 export const getSlidingMoves = ({
   position,
   direction,
@@ -422,3 +429,136 @@ export function getTileClass({
     }
   }
 }
+
+export function getAllValidMoves({
+  positionAfterMove,
+  position,
+  pieces,
+  moves,
+}: IGetAllValidMovesParams) {
+  for (const p of pieces) {
+    const validMoves = getValidMoves({
+      position: positionAfterMove,
+      prevPosition: position,
+      piece: p.piece,
+      rank: p.rank.toString(),
+      file: p.file.toString(),
+    });
+    moves.push(...validMoves);
+  }
+}
+
+export function isStalematePosition({
+  positionAfterMove,
+  position,
+  piece,
+}: IIsPlayerInCheckParams) {
+  const isInCheck = isPlayerInCheck({ positionAfterMove, position, piece });
+  if (isInCheck) return false;
+  const enemy = getEnemy(piece);
+  const pieces = getEnemyPieces({
+    position,
+    piece: enemy === "w" ? PIECES.WK : PIECES.BK,
+  });
+  const moves: MovesType = [];
+
+  getAllValidMoves({
+    positionAfterMove,
+    position,
+    pieces,
+    moves,
+  });
+  return !isInCheck && moves.length === 0;
+}
+
+export const isInsufficientMaterial = (position: string[][]) => {
+  const pieces = [
+    ...getEnemyPieces({ position, piece: "wk" }).map((p) => p.piece),
+    ...getEnemyPieces({ position, piece: "bk" }).map((p) => p.piece),
+  ];
+
+  // King vs. king
+  if (pieces.length === 2) return true;
+
+  // King and bishop vs. king
+  // King and knight vs. king
+  if (
+    pieces.length === 3 &&
+    pieces.some(
+      (p) =>
+        getPieceType(p) === PIECE_TYPE[PIECES.BB] ||
+        getPieceType(p) === PIECE_TYPE[PIECES.BN],
+    )
+  )
+    return true;
+
+  // King and bishop vs. king and bishop of the same color as the opponent's bishop
+  if (
+    pieces.length === 4 &&
+    pieces.every(
+      (p) =>
+        getPieceType(p) === PIECE_TYPE[PIECES.BB] ||
+        getPieceType(p) === PIECE_TYPE[PIECES.BK],
+    ) &&
+    new Set(pieces).size === 4
+  )
+    return true;
+
+  return false;
+};
+
+export function isCheckMate({
+  positionAfterMove,
+  position,
+  piece,
+}: IIsPlayerInCheckParams) {
+  const enemy = getEnemy(piece);
+  const realPiece = enemy === "w" ? PIECES.WK : PIECES.BK;
+  const pieces = getEnemyPieces({
+    position,
+    piece,
+  });
+  const isInCheck = isPlayerInCheck({
+    positionAfterMove,
+    position,
+    piece: realPiece,
+  });
+  if (!isInCheck) return false;
+
+  const moves: MovesType = [];
+
+  getAllValidMoves({
+    positionAfterMove,
+    position,
+    pieces,
+    moves,
+  });
+  console.log({
+    isInCheck,
+    moves,
+  });
+
+  return isInCheck && moves.length === 0;
+}
+
+// isCheckMate : function(position,player,castleDirection) {
+//     const isInCheck = this.isPlayerInCheck({positionAfterMove: position, player})
+//
+//     if (!isInCheck)
+//         return false
+//
+//     const pieces = getPieces(position,player)
+//     const moves = pieces.reduce((acc,p) => acc = [
+//         ...acc,
+//         ...(getValidMoves({
+//                 position,
+//                 castleDirection,
+//                 ...p
+//             })
+//         )
+//     ], [])
+//
+//     return (isInCheck && moves.length === 0)
+// },
+//
+//

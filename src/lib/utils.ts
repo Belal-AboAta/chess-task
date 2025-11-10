@@ -103,6 +103,24 @@ export function createPosition() {
   position[7][6] = PIECES.BN;
   position[7][7] = PIECES.BR;
 
+  // a stalmate position before a move
+  // position[6][0] = PIECES.BK;
+  // position[7][5] = PIECES.WR;
+  // position[4][2] = PIECES.WK;
+  // position[0][7] = PIECES.WQ;
+
+  // a insufficient material position before a move
+  // position[7][4] = PIECES.BK;
+  // position[5][5] = PIECES.WB;
+  // position[6][6] = PIECES.BP;
+  // position[0][0] = PIECES.WK;
+
+  // a checkmate position before a move
+  // position[6][0] = PIECES.BK;
+  // position[7][1] = PIECES.WR;
+  // position[4][2] = PIECES.WK;
+  // position[0][7] = PIECES.WQ;
+
   return position;
 }
 

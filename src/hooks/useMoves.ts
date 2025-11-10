@@ -1,10 +1,16 @@
-import { preformMove } from "@/lib/piecesMoves";
+import {
+  isCheckMate,
+  isInsufficientMaterial,
+  isStalematePosition,
+  preformMove,
+} from "@/lib/piecesMoves";
 import { getCoords } from "@/lib/utils";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import {
   changeTurn,
   clearCandidateMoves,
   selectCandidateMoves,
+  setGameState,
   setPosition,
 } from "@/store/positionSlice";
 import { selectTileSize } from "@/store/tileSizeSlice";
@@ -39,9 +45,33 @@ export const useMoves = () => {
     // TODO: add sounds for capture, check, checkmate, castling, promotion
 
     dispatch(clearCandidateMoves());
-    dispatch(changeTurn());
 
     dispatch(setPosition(newPosition));
+
+    const detectStalemate = isStalematePosition({
+      positionAfterMove: newPosition,
+      position: currentPosition,
+      piece: piece,
+    });
+
+    const detectCheckMate = isCheckMate({
+      positionAfterMove: newPosition,
+      position: currentPosition,
+      piece: piece,
+    });
+
+    if (detectCheckMate) {
+      dispatch(setGameState("checkmate"));
+    }
+    const detectInsufficientMaterial = isInsufficientMaterial(newPosition);
+
+    if (detectStalemate || detectInsufficientMaterial) {
+      dispatch(setGameState("draw"));
+    }
+
+    if (!detectStalemate && !detectCheckMate && !detectInsufficientMaterial) {
+      dispatch(changeTurn());
+    }
   };
 
   return {
