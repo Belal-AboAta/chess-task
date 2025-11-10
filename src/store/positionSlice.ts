@@ -1,7 +1,7 @@
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
 
 import { createPosition } from "@/lib/utils";
-import type { GameStateType } from "@/types/gameStateTypes";
+import type { castlingDirection, GameStateType } from "@/types/gameStateTypes";
 import type { PlayerTurnType } from "@/types/playerTypes";
 
 import type { RootState } from "./";
@@ -22,6 +22,7 @@ export interface positionState {
       file: number;
     };
   };
+  castlingDirection: castlingDirection[];
 }
 
 const initialState: positionState = {
@@ -30,6 +31,16 @@ const initialState: positionState = {
   gameState: "ongoing",
   turn: "wk",
   promotionSquare: undefined,
+  castlingDirection: [
+    {
+      w: {
+        direction: "both",
+      },
+      b: {
+        direction: "both",
+      },
+    },
+  ],
 };
 
 export const positionSlice = createSlice({
@@ -52,6 +63,9 @@ export const positionSlice = createSlice({
       if (state.positions.length > 1 && state.gameState === "ongoing") {
         state.positions.pop();
         state.turn = state.turn === "wk" ? "bk" : "wk";
+      }
+      if (state.castlingDirection.length > 1) {
+        state.castlingDirection.pop();
       }
     },
     setNewGame: (state) => {
@@ -87,6 +101,9 @@ export const positionSlice = createSlice({
     clearPromotionSquare: (state) => {
       state.promotionSquare = undefined;
     },
+    setCastlingDirection: (state, action: PayloadAction<castlingDirection>) => {
+      state.castlingDirection.push(action.payload);
+    },
   },
 });
 
@@ -103,6 +120,7 @@ export const {
   changeTurn,
   setPromotionSquare,
   clearPromotionSquare,
+  setCastlingDirection,
 } = positionSlice.actions;
 
 export const selectPositions = (state: RootState) => state.position.positions;
@@ -114,5 +132,7 @@ export const selectSelectedTile = (state: RootState) =>
   state.position.selectedTile;
 export const selectPromotionSquare = (state: RootState) =>
   state.position.promotionSquare;
+export const selectCastlingDirection = (state: RootState) =>
+  state.position.castlingDirection;
 
 export default positionSlice.reducer;

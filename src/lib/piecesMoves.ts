@@ -1,6 +1,7 @@
 import { PIECE_TYPE, PIECES, PIECES_DIRECTIONS } from "@/constants/pieces";
 
 import { getEnemy, getPieceType, isEnemyPiece, isFriendlyPiece } from "./utils";
+import type { castleDirction, castlingDirection } from "@/types/gameStateTypes";
 
 export type MovesType = number[][];
 
@@ -20,7 +21,7 @@ export interface IMovesParams {
   rank: string;
   file: string;
   prevPosition?: string[][];
-  castleDirection?: string;
+  castlingDirection?: castlingDirection;
 }
 
 export interface IGetPieceParams {
@@ -77,6 +78,25 @@ export interface IGetAllValidMovesParams {
   position: string[][];
   pieces: ReturnType<typeof getEnemyPieces>;
   moves: MovesType;
+}
+
+export interface IUpdateCastlingDirectionParams {
+  castlingDirection: castlingDirection;
+  piece: string;
+  from: {
+    rank: number;
+    file: number;
+  };
+}
+
+export interface IGetCastlingMovesParams {
+  castleDirection: castleDirction;
+  position: string[][];
+  piece: string;
+  from: {
+    rank: number;
+    file: number;
+  };
 }
 
 export const getSlidingMoves = ({
@@ -198,6 +218,7 @@ export const getPieceMoves = ({
   piece,
   rank,
   file,
+  castlingDirection,
 }: IMovesParams) => {
   const pieceType = getPieceType(piece);
 
@@ -234,7 +255,17 @@ export const getPieceMoves = ({
     }
   });
 
-  // TODO: add Castling moves for King
+  if (pieceType === PIECE_TYPE[PIECES.WK]) {
+    const kingColor = piece.startsWith("w") ? "w" : "b";
+    const castleDirection = castlingDirection?.[kingColor].direction || "none";
+    const castlingMoves = getCastlingMoves({
+      position,
+      castleDirection,
+      piece,
+      from: { rank: +rank, file: +file },
+    });
+    moves.push(...castlingMoves);
+  }
 
   return moves;
 };
@@ -374,6 +405,7 @@ export function getValidMoves({
   rank,
   file,
   prevPosition,
+  castlingDirection,
 }: IMovesParams) {
   const possibleMoves = getPieceMoves({
     position,
@@ -381,6 +413,7 @@ export function getValidMoves({
     rank,
     file,
     prevPosition,
+    castlingDirection,
   });
 
   const validMoves: MovesType = [];
@@ -563,24 +596,215 @@ export function isCheckMate({
   return isInCheck && moves.length === 0;
 }
 
-// isCheckMate : function(position,player,castleDirection) {
-//     const isInCheck = this.isPlayerInCheck({positionAfterMove: position, player})
-//
-//     if (!isInCheck)
-//         return false
-//
-//     const pieces = getPieces(position,player)
-//     const moves = pieces.reduce((acc,p) => acc = [
-//         ...acc,
-//         ...(getValidMoves({
-//                 position,
-//                 castleDirection,
-//                 ...p
-//             })
-//         )
-//     ], [])
-//
-//     return (isInCheck && moves.length === 0)
-// },
-//
-//
+export function updateCastleDirection({
+  castlingDirection,
+  piece,
+  from,
+}: IUpdateCastlingDirectionParams) {
+  const isPieceKing = getPieceType(piece) === PIECE_TYPE[PIECES.WK];
+  const isPieceRook = getPieceType(piece) === PIECE_TYPE[PIECES.WR];
+  const pieceColor = piece.startsWith("w") ? "w" : "b";
+
+  const newCastlingDirection: castlingDirection = {
+    w: { direction: castlingDirection.w.direction },
+    b: { direction: castlingDirection.b.direction },
+  };
+  if (isPieceKing) {
+    newCastlingDirection[pieceColor].direction = "none";
+  }
+
+  if (isPieceRook) {
+    if (from.file === 0) {
+      // Queenside rook
+      if (newCastlingDirection[pieceColor].direction === "both") {
+        newCastlingDirection[pieceColor].direction = "left";
+      } else if (newCastlingDirection[pieceColor].direction === "left") {
+        newCastlingDirection[pieceColor].direction = "left";
+      }
+    }
+    if (from.file === 7) {
+      // Kingside rook
+      if (newCastlingDirection[pieceColor].direction === "both") {
+        newCastlingDirection[pieceColor].direction = "left";
+      } else if (newCastlingDirection[pieceColor].direction === "left") {
+        newCastlingDirection[pieceColor].direction = "right";
+      }
+    }
+  }
+  return newCastlingDirection;
+}
+
+export function getCastlingMoves({
+  position,
+  castleDirection,
+  piece,
+  from: { rank, file },
+}: IGetCastlingMovesParams) {
+  const moves: MovesType = [];
+
+  if (file !== 4 || rank % 7 !== 0 || castleDirection === "none") {
+    return moves;
+  }
+
+  if (piece.startsWith("w")) {
+    const isWhiteInCheck = isPlayerInCheck({
+      positionAfterMove: position,
+      position,
+      piece: PIECES.WK,
+    });
+    if (isWhiteInCheck) return moves;
+
+    const isWhiteRightDirectionEmpty =
+      position[0][5] === "" && position[rank][6] === "";
+
+    if (
+      ["right", "both"].includes(castleDirection) &&
+      isWhiteRightDirectionEmpty &&
+      position[0][7] === PIECES.WR
+    ) {
+      const whiteKingMoveToFile5 = preformMove({
+        position,
+        from: { rank, file },
+        to: { rank: 0, file: 5 },
+      });
+      const isWhiteInCheckOnFile5 = isPlayerInCheck({
+        positionAfterMove: whiteKingMoveToFile5.newPosition,
+        position,
+        piece: PIECES.WK,
+      });
+
+      const whiteKingMoveToFile6 = preformMove({
+        position,
+        from: { rank, file },
+        to: { rank: 0, file: 6 },
+      });
+
+      const isWhiteInCheckOnFile6 = isPlayerInCheck({
+        positionAfterMove: whiteKingMoveToFile6.newPosition,
+        position,
+        piece: PIECES.WK,
+      });
+      if (!isWhiteInCheckOnFile5 && !isWhiteInCheckOnFile6) {
+        moves.push([0, 6]);
+      }
+    }
+
+    const isWhiteLeftDirectionEmpty =
+      position[0][3] === "" && position[0][2] === "" && position[0][1] === "";
+
+    if (
+      ["left", "both"].includes(castleDirection) &&
+      isWhiteLeftDirectionEmpty &&
+      position[0][0] === PIECES.WR
+    ) {
+      const whiteKingMoveToFile3 = preformMove({
+        position,
+        from: { rank, file },
+        to: { rank: 0, file: 3 },
+      });
+      const isWhiteInCheckOnFile3 = isPlayerInCheck({
+        positionAfterMove: whiteKingMoveToFile3.newPosition,
+        position,
+        piece: PIECES.WK,
+      });
+
+      const whiteKingMoveToFile2 = preformMove({
+        position,
+        from: { rank, file },
+        to: { rank: 0, file: 2 },
+      });
+
+      const isWhiteInCheckOnFile2 = isPlayerInCheck({
+        positionAfterMove: whiteKingMoveToFile2.newPosition,
+        position,
+        piece: PIECES.WK,
+      });
+
+      if (!isWhiteInCheckOnFile3 && !isWhiteInCheckOnFile2) {
+        moves.push([0, 2]);
+      }
+    }
+  }
+
+  if (piece.startsWith("b")) {
+    const isBlackInCheck = isPlayerInCheck({
+      positionAfterMove: position,
+      position,
+      piece: PIECES.BK,
+    });
+
+    if (isBlackInCheck) return moves;
+
+    const isBlackRightDirectionEmpty =
+      position[7][5] === "" && position[7][6] === "";
+    const isBlackLeftDirectionEmpty =
+      position[7][3] === "" && position[7][2] === "" && position[7][1] === "";
+
+    if (
+      ["right", "both"].includes(castleDirection) &&
+      isBlackRightDirectionEmpty &&
+      position[7][7] === PIECES.BR
+    ) {
+      const blackKingMoveToFile5 = preformMove({
+        position,
+        from: { rank, file },
+        to: { rank: 7, file: 5 },
+      });
+      const isBlackInCheckOnFile5 = isPlayerInCheck({
+        positionAfterMove: blackKingMoveToFile5.newPosition,
+        position,
+        piece: PIECES.BK,
+      });
+
+      const blackKingMoveToFile6 = preformMove({
+        position,
+        from: { rank, file },
+        to: { rank: 7, file: 6 },
+      });
+
+      const isBlackInCheckOnFile6 = isPlayerInCheck({
+        positionAfterMove: blackKingMoveToFile6.newPosition,
+        position,
+        piece: PIECES.BK,
+      });
+
+      if (!isBlackInCheckOnFile5 && !isBlackInCheckOnFile6) {
+        moves.push([7, 6]);
+      }
+    }
+
+    if (
+      ["left", "both"].includes(castleDirection) &&
+      isBlackLeftDirectionEmpty &&
+      position[7][0] === PIECES.BR
+    ) {
+      const blackKingMoveToFile3 = preformMove({
+        position,
+        from: { rank, file },
+        to: { rank: 7, file: 3 },
+      });
+      const isBlackInCheckOnFile3 = isPlayerInCheck({
+        positionAfterMove: blackKingMoveToFile3.newPosition,
+        position,
+        piece: PIECES.BK,
+      });
+
+      const blackKingMoveToFile2 = preformMove({
+        position,
+        from: { rank, file },
+        to: { rank: 7, file: 2 },
+      });
+
+      const isBlackInCheckOnFile2 = isPlayerInCheck({
+        positionAfterMove: blackKingMoveToFile2.newPosition,
+        position,
+        piece: PIECES.BK,
+      });
+
+      if (!isBlackInCheckOnFile3 && !isBlackInCheckOnFile2) {
+        moves.push([7, 2]);
+      }
+    }
+  }
+  return moves;
+}

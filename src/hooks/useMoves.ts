@@ -4,6 +4,7 @@ import {
   isInsufficientMaterial,
   isStalematePosition,
   preformMove,
+  updateCastleDirection,
 } from "@/lib/piecesMoves";
 import { getCoords } from "@/lib/utils";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
@@ -11,7 +12,9 @@ import {
   changeTurn,
   clearCandidateMoves,
   selectCandidateMoves,
+  selectCastlingDirection,
   selectGameState,
+  setCastlingDirection,
   setGameState,
   setPosition,
   setPromotionSquare,
@@ -22,6 +25,7 @@ export const useMoves = () => {
   const tileSize = useAppSelector(selectTileSize);
   const validMoves = useAppSelector(selectCandidateMoves);
   const gameStat = useAppSelector(selectGameState);
+  const castlingDirection = useAppSelector(selectCastlingDirection);
   const dispatch = useAppDispatch();
   const move = (
     e: React.DragEvent<HTMLDivElement>,
@@ -43,7 +47,13 @@ export const useMoves = () => {
       to: { rank: y, file: x },
     });
 
-    // TODO: add sounds for capture, check, checkmate, castling, promotion
+    const currentCastlingDirection =
+      castlingDirection?.[castlingDirection.length - 1];
+    const newCastlingDirection = updateCastleDirection({
+      castlingDirection: currentCastlingDirection,
+      piece,
+      from: { rank: Number(rank), file: Number(file) },
+    });
 
     dispatch(clearCandidateMoves());
 
@@ -53,6 +63,7 @@ export const useMoves = () => {
         dispatch(setPromotionSquare(promotionSquare));
       } else {
         dispatch(setPosition(newPosition));
+        dispatch(setCastlingDirection(newCastlingDirection));
         dispatch(changeTurn());
       }
       if (isCapture) {

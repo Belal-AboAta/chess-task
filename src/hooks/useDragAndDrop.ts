@@ -9,6 +9,7 @@ import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import {
   clearCandidateMoves,
   clearSelectedTile,
+  selectCastlingDirection,
   selectGameState,
   selectPositions,
   selectTurn,
@@ -19,6 +20,7 @@ export const useDragAndDrop = () => {
   const turn = useAppSelector(selectTurn);
   const positions = useAppSelector(selectPositions);
   const gameStat = useAppSelector(selectGameState);
+  const castlingDirection = useAppSelector(selectCastlingDirection);
 
   const dispatch = useAppDispatch();
 
@@ -45,6 +47,9 @@ export const useDragAndDrop = () => {
 
     if (!currentPosition) return;
 
+    const currentCastlingDirection =
+      castlingDirection?.[castlingDirection.length - 1];
+
     if (gameStat === "ongoing") {
       const validMoves = getValidMoves({
         position: currentPosition,
@@ -52,6 +57,7 @@ export const useDragAndDrop = () => {
         rank: rank.toString(),
         file: file.toString(),
         prevPosition: prevPosition,
+        castlingDirection: currentCastlingDirection,
       });
 
       dispatch(setCandidateMoves(validMoves));

@@ -121,10 +121,21 @@ export function createPosition() {
   // position[4][2] = PIECES.WK;
   // position[0][7] = PIECES.WQ;
 
-  // a promotion position before a move
+  // a promotion position before 2 moves
   // position[5][0] = PIECES.WP;
   // position[7][3] = PIECES.BK;
   // position[0][0] = PIECES.WK;
+
+  // castling position before move
+  // position[0][4] = PIECES.WK;
+  // position[0][7] = PIECES.WR;
+  // position[0][0] = PIECES.WR;
+  // position[1][1] = PIECES.WP;
+  // position[7][4] = PIECES.BK;
+  // position[6][5] = PIECES.BP;
+  // position[7][7] = PIECES.BR;
+  // position[7][0] = PIECES.BR;
+
   return position;
 }
 
