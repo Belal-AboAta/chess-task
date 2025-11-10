@@ -16,6 +16,7 @@ export const usePosition = () => {
 
   const currentPosition = extractLastPosition(positions);
 
+  // TODO: implement flipboard later
   useEffect(() => {
     if (firstRender) {
       setFirstRender(false);

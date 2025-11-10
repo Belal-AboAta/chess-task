@@ -1,6 +1,12 @@
 import type { CSSProperties } from "react";
 
-import { PIECE_NOTATIONS, PIECE_TYPE, PIECES } from "@/constants/pieces";
+import {
+  GAME_STATE_INFO,
+  PIECE_NOTATIONS,
+  PIECE_TYPE,
+  PIECES,
+} from "@/constants/pieces";
+import type { GameStateType } from "@/types/gameStateTypes";
 import type { PlayerRespctiveType, PlayerTurnType } from "@/types/playerTypes";
 
 export function getBoardCoordinatesFromIndex(
@@ -31,6 +37,23 @@ export function getFileLabel(file: number): string {
 
 export function getPieceImagePath(piece: string): string {
   return new URL(`../assets/${piece}.png`, import.meta.url).href;
+}
+
+export function getGameStateInfo(
+  gameState: GameStateType,
+  turn: PlayerTurnType,
+) {
+  const gameInfo = GAME_STATE_INFO[gameState];
+  if (!gameInfo) return { imagePath: "", label: "", description: "" };
+  const imagePath = new URL(
+    gameInfo.imagePath.replace("{{}}", turn),
+    import.meta.url,
+  ).href;
+  const playerName = turn === "wk" ? "White" : "Black";
+  const label = gameInfo.label.replace("{{}}", playerName);
+  const description = gameInfo.description.replace("{{}}", playerName);
+
+  return { imagePath, label, description };
 }
 
 export function getPiecePosition(rank: number, file: number): CSSProperties {

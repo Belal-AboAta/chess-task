@@ -57,7 +57,7 @@ export const Board: React.FC<React.HTMLAttributes<HTMLDivElement>> = ({
   }, [dispatch, tileSize]);
   return (
     <div
-      className="w-full md:w-2/3 max-w-[800px] lg:rounded-lg aspect-square relative"
+      className="w-full lg:rounded-lg aspect-square relative"
       {...props}
       ref={boardRef}
     >

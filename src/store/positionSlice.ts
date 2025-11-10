@@ -25,6 +25,9 @@ export const positionSlice = createSlice({
   name: "position",
   initialState,
   reducers: {
+    setPositions: (state, action: PayloadAction<string[][][]>) => {
+      state.positions = action.payload;
+    },
     setPosition: (state, action: PayloadAction<string[][]>) => {
       state.positions.push(action.payload);
     },
@@ -33,6 +36,12 @@ export const positionSlice = createSlice({
       action: PayloadAction<positionState["candidateMoves"]>,
     ) => {
       state.candidateMoves = action.payload;
+    },
+    undomMove: (state) => {
+      if (state.positions.length > 1) {
+        state.positions.pop();
+        state.turn = state.turn === "wk" ? "bk" : "wk";
+      }
     },
     clearCandidateMoves: (state) => {
       state.candidateMoves = undefined;
@@ -59,8 +68,10 @@ export const positionSlice = createSlice({
 });
 
 export const {
+  setPositions,
   setPosition,
   setCandidateMoves,
+  undomMove,
   clearCandidateMoves,
   setSelectedTile,
   clearSelectedTile,

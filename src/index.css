@@ -11,9 +11,14 @@ body {
   background-color: var(--color-background);
   color: var(--color-foreground);
   font-family: "Poppins", Helvetica, Arial, sans-serif;
-  height: 100vh;
+  min-height: 100vh;
   margin: 0;
   padding: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  @apply md:p-4;
 }
 
 #root {
@@ -27,6 +32,7 @@ body {
 @theme {
   --color-white-tile: #8ca2ad;
   --color-black-tile: #dee3e6;
+  --color-box-background: #262421;
 }
 
 .highlight:after {

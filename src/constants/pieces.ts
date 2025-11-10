@@ -1,3 +1,5 @@
+import type { GameStateType } from "@/types/gameStateTypes";
+
 export const PIECES = {
   WK: "wk",
   WQ: "wq",
@@ -89,4 +91,24 @@ export const PIECES_DIRECTIONS: Record<PieceTypeKey, PieceDirectionConfig> = {
     slides: true,
   },
   [PIECE_TYPE[PIECES.WK]]: { directions: KING_DIRECTIONS, slides: false },
+};
+
+export const GAME_STATE_INFO: Record<GameStateType, Record<string, string>> = {
+  ongoing: {
+    imagePath: "../assets/{{}}.png",
+    label: "{{}} turn",
+    description: "{{}} to move.",
+  },
+  checkmate: {
+    imagePath: "../assets/{{}}.png",
+    label: "Checkmate!",
+    description: "{{}} wins the game.",
+  },
+
+  draw: {
+    imagePath: "../assets/draw.svg",
+    label: "Draw!",
+    description: "The game ended in a draw.",
+  },
+  promotion: {},
 };
