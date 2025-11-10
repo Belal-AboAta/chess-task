@@ -574,7 +574,7 @@ export function isCheckMate({
   const enemy = getEnemy(piece);
   const realPiece = enemy === "w" ? PIECES.WK : PIECES.BK;
   const pieces = getEnemyPieces({
-    position,
+    position: positionAfterMove,
     piece,
   });
   const isInCheck = isPlayerInCheck({
