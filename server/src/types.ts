@@ -1,11 +1,13 @@
+import type { Chess } from "chess.js";
+
 export interface ServerToClientEvents {
-  noArg: () => void;
-  basicEmit: (a: number, b: string, c: Buffer) => void;
-  withAck: (d: string, callback: (e: number) => void) => void;
+  "room-created": (data: roomCreatedData) => void;
+  error: (data: ErrorData) => void;
 }
 
 export interface ClientToServerEvents {
-  hello: () => void;
+  "create-room": () => void;
+  "join-room": (data: joinRoomData) => void;
 }
 
 export interface InterServerEvents {
@@ -13,6 +15,34 @@ export interface InterServerEvents {
 }
 
 export interface SocketData {
-  name: string;
-  age: number;
+  roomId?: string;
+  playerColor?: PlayerColor;
+}
+
+export interface GameRoom {
+  id: string;
+  chess: Chess;
+  players: Map<PlayerColor, Player | null>;
+  gameState?: "waiting" | "playing" | "ended";
+  winner?: PlayerColor | "draw";
+}
+
+export type PlayerColor = "w" | "b";
+
+export interface Player {
+  id: string;
+  color: PlayerColor;
+}
+
+export interface roomCreatedData {
+  roomId: string;
+  playerColor: PlayerColor;
+}
+
+export interface joinRoomData {
+  roomId: string;
+}
+
+export interface ErrorData {
+  message: string;
 }
