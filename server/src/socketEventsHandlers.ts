@@ -87,6 +87,8 @@ export function socketEventsHandlers(
 
     socket.join(roomId);
 
+    io.to(roomId).emit("opponent-joined");
+
     console.log(`Player ${socket.id} (${playerColor}) joined room ${roomId}`);
   });
 

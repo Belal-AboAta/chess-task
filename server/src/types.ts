@@ -3,6 +3,7 @@ import type { Chess } from "chess.js";
 export interface ServerToClientEvents {
   "room-created": (data: roomCreatedData) => void;
   error: (data: ErrorData) => void;
+  "opponent-joined": () => void;
 }
 
 export interface ClientToServerEvents {
