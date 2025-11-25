@@ -5,6 +5,7 @@ import { createServer } from "http";
 import { Server } from "socket.io";
 
 import { CLIENT_URL, PORT } from "./constants";
+import { socketEventsHandlers } from "./socketEventsHandlers";
 
 dotenv.config();
 
@@ -28,11 +29,7 @@ const io = new Server(httpServer, {
 });
 
 io.on("connection", (socket) => {
-  console.log("A user connected: ", socket.id);
-
-  socket.on("disconnect", () => {
-    console.log("User disconnected: ", socket.id);
-  });
+  socketEventsHandlers(io, socket);
 });
 
 httpServer.listen(PORT, () => {
