@@ -142,7 +142,7 @@ export const Lobby = () => {
                 setJoinRoomInput(e.target.value.toUpperCase().slice(0, 6))
               }
               placeholder="Enter Room Code"
-              className="w-full px-4 py-3 border-2 border-slate-300 rounded-xl focus:border-blue-500 focus:outline-none font-mono text-center text-lg tracking-wider uppercase"
+              className="w-full px-4 py-3 border-2 border-slate-300 rounded-xl focus:border-blue-500 text-black focus:outline-none font-mono text-center text-lg tracking-wider uppercase"
               maxLength={6}
             />
             <button
