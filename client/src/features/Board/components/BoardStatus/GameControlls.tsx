@@ -1,39 +1,36 @@
 import clsx from "clsx";
 
-import { useAppDispatch, useAppSelector } from "@/store/hooks";
-import {
-  selectGameState,
-  selectPositions,
-  setNewGame,
-  undomMove,
-} from "@/store/positionSlice";
-import { ChessKing, Undo2Icon } from "lucide-react";
+import { getSocket } from "@/socket/socket";
+import { useAppDispatch } from "@/store/hooks";
+import { setNewGame } from "@/store/positionSlice";
+import { ChessKing } from "lucide-react";
+import { setGameMode } from "@/store/gameSlice";
 
 export interface GameControllsProps {
   tileSize: number;
 }
 
 export const GameControlls = ({ tileSize }: GameControllsProps) => {
-  const positions = useAppSelector(selectPositions);
-  const gameState = useAppSelector(selectGameState);
   const dispatch = useAppDispatch();
+
+  const socket = getSocket();
   const ICONS = [
     {
-      icon: <Undo2Icon size={tileSize / 4} />,
-      action: () => dispatch(undomMove()),
-      title: "Undo Move",
-      isDisabled: positions.length <= 1 || gameState !== "ongoing",
-    },
-    {
       icon: <ChessKing size={tileSize / 4} />,
-      action: () => dispatch(setNewGame()),
+      action: () => {
+        if (socket) {
+          dispatch(setNewGame());
+          socket.emit("leave-room");
+          dispatch(setGameMode("waiting"));
+        }
+      },
       title: "New Game",
-      isDisabled: positions.length <= 1,
+      isDisabled: false,
     },
   ];
 
   return (
-    <div className="flex flex-row justify-between items-center p-4">
+    <div className="flex flex-row justify-center items-center p-4">
       {ICONS.map((control, index) => (
         <button
           key={index}

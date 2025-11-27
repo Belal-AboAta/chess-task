@@ -161,6 +161,25 @@ export function socketEventsHandlers(
     }
   });
 
+  socket.on("leave-room", () => {
+    const { roomId } = socket.data;
+
+    if (!roomId) {
+      socket.emit("error", { message: "You are not in a room." });
+      return;
+    }
+
+    removePlayer(roomId, socket.id);
+    socket.leave(roomId);
+
+    socket.data.roomId = undefined;
+    socket.data.playerColor = undefined;
+
+    io.to(roomId).emit("opponent-left");
+
+    console.log(`Player ${socket.id} left room ${roomId}`);
+  });
+
   socket.on("disconnect", () => {
     const { roomId } = socket.data;
 

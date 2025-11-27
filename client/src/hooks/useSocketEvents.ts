@@ -6,6 +6,7 @@ import { convertAlgebraicToCoords, extractLastPosition } from "@/lib/utils";
 import { getSocket } from "@/socket/socket";
 import {
   setError,
+  setGameMode,
   setOpponentConnected,
   setPlayerColor,
   setRoomId,
@@ -47,6 +48,7 @@ export const useSocketEvents = () => {
     const handleOpponentJoined = () => {
       console.log("Opponent joined");
       dispatch(setOpponentConnected(true));
+      dispatch(setGameMode("playing"));
     };
 
     const handleMoveMade = (data: MoveMadeData) => {
@@ -122,11 +124,17 @@ export const useSocketEvents = () => {
       dispatch(setPlayerColor(data.playerColor));
     };
 
+    const handleOpponentLeft = () => {
+      dispatch(setOpponentConnected(false));
+      dispatch(setGameMode("waiting"));
+    };
+
     socket.on("room-created", handleRoomCreated);
     socket.on("connect_error", handleConnectError);
     socket.on("opponent-joined", handleOpponentJoined);
     socket.on("joined-room", hanldeJoinRomm);
     socket.on("move-made", handleMoveMade);
+    socket.on("opponent-left", handleOpponentLeft);
     socket.on("error", handleError);
 
     return () => {
@@ -135,6 +143,7 @@ export const useSocketEvents = () => {
       socket.off("opponent-joined", handleOpponentJoined);
       socket.off("joined-room", hanldeJoinRomm);
       socket.off("move-made", handleMoveMade);
+      socket.off("opponent-left", handleOpponentLeft);
       socket.off("error", handleError);
     };
   }, [dispatch, positions, castlingDirection]);

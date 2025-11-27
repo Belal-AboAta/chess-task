@@ -7,12 +7,14 @@ export interface ServerToClientEvents {
   "move-made": (data: MoveMadeData) => void;
   "game-over": (data: GameOverData) => void;
   "joined-room": (data: joinRoomData) => void;
+  "opponent-left": () => void;
 }
 
 export interface ClientToServerEvents {
   "make-move": (data: MakeMoveData) => void;
   "create-room": () => void;
   "join-room": (data: joinRoomData) => void;
+  "leave-room": () => void;
 }
 
 export interface InterServerEvents {

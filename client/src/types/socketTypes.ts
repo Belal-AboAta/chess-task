@@ -6,12 +6,14 @@ export interface ServerToClientEvents {
   "opponent-joined": () => void;
   "move-made": (data: MoveMadeData) => void;
   "joined-room": (data: joinRoomData) => void;
+  "opponent-left": () => void;
 }
 
 export interface ClientToServerEvents {
   "create-room": () => void;
   "join-room": (data: JoinRoomData) => void;
   "make-move": (data: MakaeMoveData) => void;
+  "leave-room": () => void;
 }
 
 export interface JoinRoomData {
