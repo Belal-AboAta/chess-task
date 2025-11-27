@@ -186,3 +186,18 @@ export function isFriendlyPiece(piece: string, otherPiece: string): boolean {
 export function isPlayerTurn(turn: PlayerTurnType, piece: string): boolean {
   return isFriendlyPiece(turn, piece);
 }
+
+export function convertAlgebraicToCoords(square: string): {
+  rank: number;
+  file: number;
+} {
+  const files = ["a", "b", "c", "d", "e", "f", "g", "h"];
+  const file = files.indexOf(square[0]);
+  const rank = +square[1] - 1;
+  return { rank, file };
+}
+
+export function convertCoordsToAlgebraic(rank: number, file: number): string {
+  const files = ["a", "b", "c", "d", "e", "f", "g", "h"];
+  return `${files[file]}${rank + 1}`;
+}

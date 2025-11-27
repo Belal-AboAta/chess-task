@@ -1,17 +1,15 @@
 import { createPortal } from "react-dom";
 
 import { PROMOTION_PIECES } from "@/constants/pieces";
-import { extractLastPosition, getPieceImagePath } from "@/lib/utils";
+import { convertCoordsToAlgebraic, getPieceImagePath } from "@/lib/utils";
+import { getSocket } from "@/socket/socket";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import {
-  changeTurn,
   clearPromotionSquare,
   selectGameState,
-  selectPositions,
   selectPromotionSquare,
   selectTurn,
   setGameState,
-  setPosition,
 } from "@/store/positionSlice";
 import { selectTileSize } from "@/store/tileSizeSlice";
 
@@ -20,28 +18,31 @@ export const PromotionBox = () => {
   const gameState = useAppSelector(selectGameState);
   const turn = useAppSelector(selectTurn);
   const tileSize = useAppSelector(selectTileSize);
-  const positions = useAppSelector(selectPositions);
   const promotionSquare = useAppSelector(selectPromotionSquare);
-
-  const currentPosition = extractLastPosition(positions)?.map((row) => [
-    ...row,
-  ]);
+  const socket = getSocket();
 
   if (gameState !== "promotion") {
     return null;
   }
   const promotionOptoin = PROMOTION_PIECES[turn];
   const handleClick = (piece: string) => {
-    if (currentPosition) {
-      currentPosition[promotionSquare!.from.rank][promotionSquare!.from.file] =
-        "";
-      currentPosition[promotionSquare!.to.rank][promotionSquare!.to.file] =
-        piece;
+    if (socket) {
+      const fromSquare = convertCoordsToAlgebraic(
+        promotionSquare!.from.rank,
+        promotionSquare!.from.file,
+      );
+      const toSquare = convertCoordsToAlgebraic(
+        promotionSquare!.to.rank,
+        promotionSquare!.to.file,
+      );
+      socket.emit("make-move", {
+        from: fromSquare,
+        to: toSquare,
+        promotion: piece[1],
+      });
     }
 
-    dispatch(setPosition(currentPosition!));
     dispatch(clearPromotionSquare());
-    dispatch(changeTurn());
     dispatch(setGameState("ongoing"));
   };
   document.body.style.overflow = "hidden";

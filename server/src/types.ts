@@ -1,12 +1,16 @@
-import type { Chess } from "chess.js";
+import type { Chess, Move, Square } from "chess.js";
 
 export interface ServerToClientEvents {
   "room-created": (data: roomCreatedData) => void;
   error: (data: ErrorData) => void;
   "opponent-joined": () => void;
+  "move-made": (data: MoveMadeData) => void;
+  "game-over": (data: GameOverData) => void;
+  "joined-room": (data: joinRoomData) => void;
 }
 
 export interface ClientToServerEvents {
+  "make-move": (data: MakeMoveData) => void;
   "create-room": () => void;
   "join-room": (data: joinRoomData) => void;
 }
@@ -46,4 +50,27 @@ export interface joinRoomData {
 
 export interface ErrorData {
   message: string;
+}
+
+export interface MakeMoveData {
+  from: Square;
+  to: Square;
+  promotion?: "q" | "r" | "b" | "n";
+}
+
+export interface MoveMadeData {
+  move: Move;
+  isCheck: boolean;
+  isCheckmate: boolean;
+  isDraw: boolean;
+}
+
+export interface GameOverData {
+  result: "checkmate" | "draw";
+  winner?: PlayerColor;
+}
+
+export interface joinRoomData {
+  roomId: string;
+  playerColor: PlayerColor;
 }

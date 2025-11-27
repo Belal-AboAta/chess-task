@@ -3,6 +3,7 @@ import type { Server, Socket } from "socket.io";
 import {
   addPlayer,
   createGameRoom,
+  endGame,
   getRoom,
   removePlayer,
 } from "./gameRoomManagement";
@@ -87,9 +88,77 @@ export function socketEventsHandlers(
 
     socket.join(roomId);
 
+    socket.emit("joined-room", {
+      roomId,
+      playerColor,
+    });
     io.to(roomId).emit("opponent-joined");
 
     console.log(`Player ${socket.id} (${playerColor}) joined room ${roomId}`);
+  });
+
+  socket.on("make-move", (data) => {
+    try {
+      const { roomId, playerColor } = socket.data;
+
+      if (!roomId || !playerColor) {
+        return;
+      }
+
+      const room = getRoom(roomId);
+
+      if (!room) {
+        return;
+      }
+
+      if (room.gameState !== "playing") {
+        return;
+      }
+
+      if (room.chess.turn() !== playerColor) {
+        return;
+      }
+
+      const move = room.chess.move({
+        from: data.from,
+        to: data.to,
+        promotion: data.promotion,
+      });
+
+      if (!move) {
+        return;
+      }
+
+      const isCheckmate = room.chess.isCheckmate();
+      const isStalemate = room.chess.isStalemate();
+      const isDraw = room.chess.isDraw();
+      const isCheck = room.chess.inCheck();
+
+      io.to(roomId).emit("move-made", {
+        move,
+        isCheck,
+        isCheckmate,
+        isDraw: isDraw || isStalemate,
+      });
+
+      if (isCheckmate) {
+        endGame(roomId, playerColor);
+        io.to(roomId).emit("game-over", {
+          result: "checkmate",
+          winner: playerColor,
+        });
+      } else if (isStalemate || isDraw) {
+        endGame(roomId);
+        io.to(roomId).emit("game-over", {
+          result: "draw",
+        });
+      }
+    } catch (error) {
+      console.error("Error processing move:", error);
+      socket.emit("error", {
+        message: "An error occurred while processing the move.",
+      });
+    }
   });
 
   socket.on("disconnect", () => {

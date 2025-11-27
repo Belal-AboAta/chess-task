@@ -5,6 +5,7 @@ import {
   extractPositionAtLastIndex,
   isPlayerTurn,
 } from "@/lib/utils";
+import { selectIsMyTurn } from "@/store/gameSlice";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import {
   clearCandidateMoves,
@@ -21,6 +22,7 @@ export const useDragAndDrop = () => {
   const positions = useAppSelector(selectPositions);
   const gameStat = useAppSelector(selectGameState);
   const castlingDirection = useAppSelector(selectCastlingDirection);
+  const isMyTurn = useAppSelector(selectIsMyTurn);
 
   const dispatch = useAppDispatch();
 
@@ -29,7 +31,7 @@ export const useDragAndDrop = () => {
     { piece, rank, file }: PieceProps,
   ) => {
     const isPieceTurn = isPlayerTurn(turn, piece);
-    if (!isPieceTurn) {
+    if (!isPieceTurn || !isMyTurn) {
       e.preventDefault();
       return;
     }
