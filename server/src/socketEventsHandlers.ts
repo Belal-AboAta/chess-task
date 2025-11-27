@@ -190,5 +190,4 @@ export function socketEventsHandlers(
 
     console.log(`Client disconnected: ${socket.id}`);
   });
-  console.log("Socket io", io);
 }
