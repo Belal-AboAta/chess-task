@@ -8,6 +8,7 @@ import {
 } from "@/constants/pieces";
 import type { GameStateType } from "@/types/gameStateTypes";
 import type { PlayerRespctiveType, PlayerTurnType } from "@/types/playerTypes";
+import type { PlayerColor } from "@/types/socketTypes";
 
 export function getBoardCoordinatesFromIndex(
   index: number,
@@ -39,9 +40,20 @@ export function getPieceImagePath(piece: string): string {
   return new URL(`../assets/${piece}.png`, import.meta.url).href;
 }
 
+export function isMyTurn(
+  turn: PlayerTurnType,
+  playerTurn: PlayerColor,
+): boolean {
+  return (
+    (playerTurn === "w" && turn === "wk") ||
+    (playerTurn === "b" && turn === "bk")
+  );
+}
+
 export function getGameStateInfo(
   gameState: GameStateType,
   turn: PlayerTurnType,
+  playerTurn: PlayerColor,
 ) {
   const gameInfo = GAME_STATE_INFO[gameState];
   if (!gameInfo) return { imagePath: "", label: "", description: "" };
@@ -50,7 +62,10 @@ export function getGameStateInfo(
     import.meta.url,
   ).href;
   const playerName = turn === "wk" ? "White" : "Black";
-  const label = gameInfo.label.replace("{{}}", playerName);
+  const label = gameInfo.label.replace(
+    "{{}}",
+    isMyTurn(turn, playerTurn) ? "Your" : playerName,
+  );
   const description = gameInfo.description.replace("{{}}", playerName);
 
   return { imagePath, label, description };

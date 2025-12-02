@@ -1,4 +1,5 @@
 import { getGameStateInfo } from "@/lib/utils";
+import { selectPlayerColor } from "@/store/gameSlice";
 import { useAppSelector } from "@/store/hooks";
 import { selectGameState, selectTurn } from "@/store/positionSlice";
 
@@ -9,8 +10,13 @@ export interface GameStateComponentProps {
 export const GameStateComponent = ({ tileSize }: GameStateComponentProps) => {
   const gameState = useAppSelector(selectGameState);
   const turn = useAppSelector(selectTurn);
+  const playerTurn = useAppSelector(selectPlayerColor);
 
-  const { imagePath, label, description } = getGameStateInfo(gameState, turn);
+  const { imagePath, label, description } = getGameStateInfo(
+    gameState,
+    turn,
+    playerTurn || "w",
+  );
   return (
     <div className="flex  items-center gap-4">
       {imagePath && (
