@@ -1,6 +1,7 @@
 import { preformMove } from "@/lib/piecesMoves";
 import { convertCoordsToAlgebraic, getCoords } from "@/lib/utils";
 import { getSocket } from "@/socket/socket";
+import { selectPlayerColor } from "@/store/gameSlice";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import {
   clearCandidateMoves,
@@ -14,6 +15,7 @@ import { selectTileSize } from "@/store/tileSizeSlice";
 export const useMoves = () => {
   const tileSize = useAppSelector(selectTileSize);
   const validMoves = useAppSelector(selectCandidateMoves);
+  const playerColor = useAppSelector(selectPlayerColor);
   const gameStat = useAppSelector(selectGameState);
   const dispatch = useAppDispatch();
 
@@ -23,12 +25,15 @@ export const useMoves = () => {
     ref: React.RefObject<HTMLDivElement | null>,
   ) => {
     if (!ref.current || !validMoves) return;
-    const { x, y } = getCoords(e, ref, tileSize);
+    let { x, y } = getCoords(e, ref, tileSize);
     const [piece, rank, file] = e.dataTransfer.getData("text").split(",");
     const socket = getSocket();
 
     console.log("piece", piece);
 
+    const isPlayerColorBlack = playerColor === "b";
+    y = isPlayerColorBlack ? Math.abs(7 - y) : y;
+    x = isPlayerColorBlack ? Math.abs(7 - x) : x;
     const isValidMove = validMoves.some(([r, f]) => r === y && f === x);
     if (!isValidMove) return;
 

@@ -74,6 +74,9 @@ export const useDragAndDrop = () => {
   const onDragEnd = (e: React.DragEvent<HTMLImageElement>) => {
     const element = e.target as HTMLImageElement;
 
+    console.log("Drag Ended");
+    console.log(element);
+    console.log(e.dataTransfer.getData("text/plain"));
     element.style.display = "block";
     dispatch(clearCandidateMoves());
     dispatch(clearSelectedTile());

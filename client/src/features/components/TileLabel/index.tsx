@@ -6,6 +6,7 @@ import { useAppSelector } from "@/store/hooks";
 import { selectTileSize } from "@/store/tileSizeSlice";
 import type { PlayerRespctiveType } from "@/types/playerTypes";
 import type { TileType } from "@/types/tileTypes";
+import { selectPlayerColor } from "@/store/gameSlice";
 
 export interface TileLabelProps extends React.HTMLAttributes<HTMLSpanElement> {
   tileType: TileType;
@@ -23,6 +24,7 @@ export const TileLabel: React.FC<TileLabelProps> = ({
   const fileLabel = getFileLabel(
     respective === "white" ? index + 1 : 8 - index,
   );
+  const playerColor = useAppSelector(selectPlayerColor);
 
   const labelFontSize = Math.floor(tileSize * 0.15) + "px";
 
@@ -34,6 +36,7 @@ export const TileLabel: React.FC<TileLabelProps> = ({
         "absolute text-[min( select-none font-bold",
         isBlack ? "text-white-tile" : "text-black-tile",
         tileType === "file" ? "left-1 bottom-1" : "right-1 top-1",
+        playerColor === "b" && "rotate-180",
       )}
       style={{ fontSize: labelFontSize }}
     >

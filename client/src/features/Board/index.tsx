@@ -10,6 +10,7 @@ import {
   extractPositionAtLastIndex,
   getBoardCoordinatesFromIndex,
 } from "@/lib/utils";
+import { selectPlayerColor } from "@/store/gameSlice";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { selectRespective } from "@/store/playerRespectiveSlice";
 import {
@@ -18,6 +19,7 @@ import {
   selectTurn,
 } from "@/store/positionSlice";
 import { changeTileSize } from "@/store/tileSizeSlice";
+
 import { TileLabel } from "../components/TileLabel";
 import { Pieces } from "../Pieces";
 
@@ -27,6 +29,7 @@ export const Board: React.FC<React.HTMLAttributes<HTMLDivElement>> = ({
   const dispatch = useAppDispatch();
   const respective = useAppSelector(selectRespective);
   const turn = useAppSelector(selectTurn);
+  const playerColor = useAppSelector(selectPlayerColor);
   const positions = useAppSelector(selectPositions);
   const candidateMoves = useAppSelector(selectCandidateMoves);
   const boardRef = useRef<HTMLDivElement>(null);
@@ -60,7 +63,10 @@ export const Board: React.FC<React.HTMLAttributes<HTMLDivElement>> = ({
   }, [dispatch, tileSize]);
   return (
     <div
-      className="w-full lg:rounded-lg aspect-square relative"
+      className={clsx(
+        "w-full lg:rounded-lg aspect-square relative",
+        playerColor === "b" && "rotate-180",
+      )}
       {...props}
       ref={boardRef}
     >
